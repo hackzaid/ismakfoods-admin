@@ -61,3 +61,4 @@ header('Access-Control-Allow-Methods: *');
 header('Access-Control-Allow-Headers: *');
 
 return $app;
+require_once __DIR__.'/../config/constant.php';

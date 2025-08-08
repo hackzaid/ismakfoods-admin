@@ -2724,4 +2724,5 @@
   'Your Database has been connected ! Just click on the section to automatically import database' => 'Your Database has been connected ! Just click on the section to automatically import database',
   'Complete Installation' => 'Complete Installation',
   'Admin Panel' => 'Admin Panel',
+  'translations' => 'Translations',
 );
