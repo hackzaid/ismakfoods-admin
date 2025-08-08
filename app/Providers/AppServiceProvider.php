@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+       require_once config_path('constants.php');
     }
 
     /**
