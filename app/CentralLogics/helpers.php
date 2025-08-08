@@ -215,7 +215,7 @@ class Helpers
     public static function get_business_settings($name)
     {
         $config = null;
-        $settings = Cache::rememberForever(CACHE_BUSINESS_SETTINGS_TABLE, function () {
+        $settings = Cache::rememberForever(\CACHE_BUSINESS_SETTINGS_TABLE, function () {
             return BusinessSetting::all();
         });
 
@@ -232,7 +232,7 @@ class Helpers
     public static function get_login_settings($name)
     {
         $config = null;
-        $settings = Cache::rememberForever(CACHE_LOGIN_SETUP_TABLE, function () {
+        $settings = Cache::rememberForever(\CACHE_LOGIN_SETUP_TABLE, function () {
             return LoginSetup::all();
         });
 
