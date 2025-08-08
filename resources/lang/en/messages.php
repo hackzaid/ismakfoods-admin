@@ -2725,4 +2725,6 @@
   'Complete Installation' => 'Complete Installation',
   'Admin Panel' => 'Admin Panel',
   'translations' => 'Translations',
+  'track_deliverymen' => 'Track deliverymen',
+  'time_schedules' => 'Time schedules',
 );
