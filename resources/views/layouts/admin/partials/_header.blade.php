@@ -3,7 +3,7 @@
         <div class="navbar-nav-wrap">
             <div class="navbar-brand-wrapper">
                 <!-- Logo -->
-                @php($restaurant_logo=\App\Model\BusinessSetting::where(['key'=>'logo'])->first()->value)
+                @php($restaurant_logo=optional(\App\Model\BusinessSetting::where('key','logo')->first())->value ?? 'def.png';
                 <a class="navbar-brand" href="{{route('admin.dashboard')}}" aria-label="">
                     <img class="navbar-brand-logo" style="object-fit: contain;"
                          onerror="this.src='{{asset('public/assets/admin/img/160x160/img1.jpg')}}'"
