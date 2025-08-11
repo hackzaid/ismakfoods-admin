@@ -744,28 +744,65 @@ class Helpers
         return $language;
     }
 
-    public static function upload(string $dir, string $format, $image = null)
+public static function upload(string $dir, string $format, $image = null)
     {
-        if ($image != null) {
-            $imageName = \Carbon\Carbon::now()->toDateString() . "-" . uniqid() . "." . $format;
-            if (!Storage::disk('public')->exists($dir)) {
-                Storage::disk('public')->makeDirectory($dir);
-            }
-            Storage::disk('public')->put($dir . $imageName, file_get_contents($image));
-        } else {
-            $imageName = 'def.png';
+        // If nothing provided, return a default name (or null if you prefer)
+        if (!$image) {
+            return 'def.png';
         }
 
-        return $imageName;
+        // Ensure target dir exists on the public disk
+        if (!Storage::disk('public')->exists($dir)) {
+            Storage::disk('public')->makeDirectory($dir);
+        }
+
+        // 1) Standard file upload (multipart/form-data)
+        if ($image instanceof UploadedFile) {
+            $ext  = strtolower($image->getClientOriginalExtension() ?: $format);
+            $name = now()->toDateString() . '-' . uniqid() . '.' . $ext;
+            // Store in public disk so it's served via public/storage
+            $image->storeAs($dir, $name, 'public');
+            return $name;
+        }
+
+        // 2) Base64 image string
+        if (is_string($image) && str_starts_with($image, 'data:image')) {
+            [$meta, $data] = explode(',', $image, 2);
+            if (!isset($data)) return 'def.png';
+            $bin  = base64_decode($data, true);
+            if ($bin === false) return 'def.png';
+            $name = now()->toDateString() . '-' . uniqid() . '.' . $format;
+            Storage::disk('public')->put($dir . $name, $bin);
+            return $name;
+        }
+
+        // 3) Absolute/relative path string (rare in FE forms; keep for compatibility)
+        if (is_string($image) && trim($image) !== '' && file_exists($image)) {
+            $name = now()->toDateString() . '-' . uniqid() . '.' . $format;
+            Storage::disk('public')->put($dir . $name, file_get_contents($image));
+            return $name;
+        }
+
+        // Fallback
+        return 'def.png';
     }
 
     public static function update(string $dir, $old_image, string $format, $image = null)
     {
-        if (Storage::disk('public')->exists($dir . $old_image)) {
+        // If no new image, keep the old one
+        if (!$image) {
+            return $old_image ?: 'def.png';
+        }
+
+        // Upload first; only delete old if upload succeeded
+        $new = self::upload($dir, $format, $image);
+
+        // Don’t delete if upload fell back to default and old image exists
+        if ($new && $new !== 'def.png' && $old_image && Storage::disk('public')->exists($dir . $old_image)) {
             Storage::disk('public')->delete($dir . $old_image);
         }
-        $imageName = Helpers::upload($dir, $format, $image);
-        return $imageName;
+
+        return $new ?: ($old_image ?: 'def.png');
     }
 
     public static function delete($full_path)
